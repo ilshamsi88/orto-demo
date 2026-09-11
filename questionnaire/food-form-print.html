@@ -1,0 +1,263 @@
+<!doctype html><html><head><meta charset="utf-8">
+<title>The Endurance Lab — Food Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap">
+<style>
+  @page { size: A4; margin: 14mm 13mm 12mm; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"DM Sans",-apple-system,Helvetica,Arial,sans-serif;
+    font-size:9.6pt; line-height:1.42; color:#221f1a; background:#fff;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .mono{font-family:"DM Mono",ui-monospace,Menlo,monospace}
+
+  /* header */
+  .band{background:#29251f;color:#f1ece2;padding:13px 15px;border-radius:9px;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:8px;font-family:"DM Mono",Menlo,monospace;
+    font-size:7.4pt;letter-spacing:.15em;text-transform:uppercase;color:#b1aa9d;margin-bottom:7px}
+  h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:22pt;line-height:1.02;
+    letter-spacing:-.012em;margin:0 0 5px}
+  .lede{margin:0;color:#b1aa9d;font-size:9pt;max-width:82%}
+
+  /* layout */
+  .cols{column-count:2;column-gap:9mm;column-fill:auto}
+  .p1{height:231mm}
+  .p2{break-before:page;page-break-before:always}
+  .p2 .cols{column-fill:balance;height:auto}
+  section{break-inside:avoid;page-break-inside:avoid;margin:0 0 11px;padding-top:8px;border-top:1px solid #dcd7cd}
+  section.first{border-top:0;padding-top:0}
+  h2{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:12.4pt;line-height:1.12;
+    margin:0 0 7px;letter-spacing:-.004em}
+  .q{margin:0 0 8px;break-inside:avoid;page-break-inside:avoid}
+  .qlabel{display:block;font-weight:600;font-size:9.4pt;margin:0 0 4px}
+  .hint{margin:-2px 0 4px;font-size:8.3pt;color:#6a655b}
+
+  /* write-in rules */
+  .rule{border-bottom:1px solid #c5bfb2;height:15px;margin-top:3px}
+  .rule.sm{height:13px}
+  .rules .rule{margin-top:0;height:16px}
+  .rules .rule + .rule{margin-top:5px}
+  .pair{display:flex;gap:10px}
+  .pair > div{flex:1}
+  .pair .tag{font-size:8.3pt;color:#6a655b;display:block}
+
+  /* option boxes */
+  .opts{display:flex;flex-wrap:wrap;gap:4px 9px;margin-top:2px}
+  .o{display:inline-flex;align-items:center;gap:4.5px;font-size:9pt;white-space:nowrap}
+  .box{width:9.5px;height:9.5px;border:1px solid #8f897d;border-radius:2.5px;flex:none;display:inline-block}
+  .box.round{border-radius:50%}
+
+  /* foods */
+  .key{border:1px dashed #c5bfb2;border-radius:7px;padding:7px 9px;margin:0 0 8px;font-size:8.5pt;color:#6a655b}
+  .key b{color:#221f1a}
+  .group{margin:0 0 7px;break-inside:avoid}
+  .group h3{margin:0 0 4px;font-family:"DM Mono",Menlo,monospace;font-weight:500;font-size:7.4pt;
+    letter-spacing:.14em;text-transform:uppercase;color:#6a655b}
+  .foods{display:flex;flex-wrap:wrap;gap:3.5px 7px}
+  .f{display:inline-flex;align-items:center;gap:4px;font-size:8.6pt;white-space:nowrap}
+  .f .bx{width:9px;height:9px;border:1px solid #8f897d;border-radius:2px;flex:none}
+
+  /* footer strip */
+  .send{background:#fbfaf7;border:1px solid #dcd7cd;border-radius:9px;padding:10px 12px;margin-top:4px;break-inside:avoid}
+  .send h2{margin-bottom:3px}
+  .send p{margin:0;font-size:8.8pt;color:#6a655b}
+  .wa{margin-top:6px;font-family:"DM Mono",Menlo,monospace;font-size:9.6pt;font-weight:500;color:#86600f}
+  footer{margin-top:9px;font-family:"DM Mono",Menlo,monospace;font-size:7.2pt;letter-spacing:.13em;
+    text-transform:uppercase;color:#8f897d;text-align:center}
+</style></head><body>
+
+<header class="band">
+  <div class="brand">
+    <svg width="19" height="19" viewBox="0 0 120 120" fill="none">
+      <path d="M14 92 L47 44 L60 63 L78 34 L106 92" stroke="#e7b23c" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M14 92 H106" stroke="#b1aa9d" stroke-width="7" stroke-linecap="round"/>
+    </svg>
+    <span>The Endurance Lab &middot; Nutrition</span>
+  </div>
+  <h1>Tell me what you eat</h1>
+  <p class="lede">Fill this in so I can build your food plan around food you actually like. Takes about 5 minutes. Be honest, no judging.</p>
+</header>
+
+<div class="cols p1">
+
+<section class="first">
+  <h2>Your day</h2>
+  <div class="q"><span class="qlabel">Your name</span><div class="rule"></div></div>
+  <div class="q"><span class="qlabel">Wake up and sleep</span>
+    <div class="pair">
+      <div><span class="tag">Wake up</span><div class="rule sm"></div></div>
+      <div><span class="tag">Sleep</span><div class="rule sm"></div></div>
+    </div>
+  </div>
+  <div class="q"><span class="qlabel">Work hours</span><div class="rule"></div></div>
+  <div class="q"><span class="qlabel">When do you usually train?</span>
+    <div class="opts">
+      <span class="o"><i class="box round"></i>Morning</span><span class="o"><i class="box round"></i>Lunch time</span>
+      <span class="o"><i class="box round"></i>After work</span><span class="o"><i class="box round"></i>Night</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>How you eat now</h2>
+  <div class="q"><span class="qlabel">Meals a day</span>
+    <div class="opts"><span class="o"><i class="box round"></i>1</span><span class="o"><i class="box round"></i>2</span>
+    <span class="o"><i class="box round"></i>3</span><span class="o"><i class="box round"></i>4+</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Breakfast</span>
+    <div class="opts"><span class="o"><i class="box round"></i>Every day</span>
+    <span class="o"><i class="box round"></i>Sometimes</span><span class="o"><i class="box round"></i>I skip it</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Eating after 10 pm</span>
+    <div class="opts"><span class="o"><i class="box round"></i>Never</span>
+    <span class="o"><i class="box round"></i>Sometimes</span><span class="o"><i class="box round"></i>Most nights</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Write a normal day of eating</span>
+    <p class="hint">Yesterday is fine. Portions help, like 1 plate rice or 2 pieces regag.</p>
+    <div class="rules"><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Allergies</h2>
+  <div class="q"><span class="qlabel">Anything you're allergic to or can't handle?</span>
+    <div class="opts">
+      <span class="o"><i class="box"></i>None</span><span class="o"><i class="box"></i>Lactose</span>
+      <span class="o"><i class="box"></i>Gluten</span><span class="o"><i class="box"></i>Nuts</span>
+      <span class="o"><i class="box"></i>Seafood</span><span class="o"><i class="box"></i>Eggs</span>
+    </div>
+  </div>
+  <div class="q"><span class="qlabel">Something else?</span><div class="rule"></div></div>
+  <div class="q"><span class="qlabel">Anything that sits badly before training?</span><div class="rule"></div></div>
+</section>
+
+<section>
+  <h2>Who makes your food</h2>
+  <div class="q"><span class="qlabel">Pick all that fit</span>
+    <div class="opts">
+      <span class="o"><i class="box"></i>I cook</span><span class="o"><i class="box"></i>Home food (family)</span>
+      <span class="o"><i class="box"></i>Meal plan company</span><span class="o"><i class="box"></i>Mostly order or eat out</span>
+    </div>
+  </div>
+  <div class="q"><span class="qlabel">Order or eat out, times a week</span>
+    <div class="opts"><span class="o"><i class="box round"></i>0&ndash;1</span><span class="o"><i class="box round"></i>2&ndash;3</span>
+    <span class="o"><i class="box round"></i>4&ndash;6</span><span class="o"><i class="box round"></i>Every day</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Where do you usually order from?</span><div class="rule"></div></div>
+  <div class="q"><span class="qlabel">Big family lunch on the weekend?</span>
+    <div class="opts"><span class="o"><i class="box round"></i>Yes</span>
+    <span class="o"><i class="box round"></i>Sometimes</span><span class="o"><i class="box round"></i>No</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Drinks</h2>
+  <div class="q"><span class="qlabel">Water a day</span>
+    <div class="opts"><span class="o"><i class="box round"></i>Under 1 L</span><span class="o"><i class="box round"></i>1&ndash;2 L</span>
+    <span class="o"><i class="box round"></i>2&ndash;3 L</span><span class="o"><i class="box round"></i>3 L+</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Karak or tea, cups a day</span>
+    <div class="opts"><span class="o"><i class="box round"></i>0</span><span class="o"><i class="box round"></i>1</span>
+    <span class="o"><i class="box round"></i>2</span><span class="o"><i class="box round"></i>3+</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Sugar in it?</span>
+    <div class="opts"><span class="o"><i class="box round"></i>No</span>
+    <span class="o"><i class="box round"></i>1 spoon</span><span class="o"><i class="box round"></i>2+ spoons</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Coffee, what and how many?</span><div class="rule"></div></div>
+  <div class="q"><span class="qlabel">Soft drinks, juice or energy drinks</span>
+    <div class="opts"><span class="o"><i class="box round"></i>Never</span>
+    <span class="o"><i class="box round"></i>Sometimes</span><span class="o"><i class="box round"></i>Every day</span></div>
+  </div>
+</section>
+
+</div>
+
+<div class="p2">
+<section class="first">
+<h2>Foods</h2>
+  <div class="key">Tick the box if you <b>eat it</b>. Cross it out if you <b>don't eat it</b>. Leave the rest blank.</div>
+  <div class="cols" style="column-gap:9mm">
+    <div class="group"><h3>Protein and dairy</h3><div class="foods">
+      <span class="f"><i class="bx"></i>Chicken</span><span class="f"><i class="bx"></i>Beef</span><span class="f"><i class="bx"></i>Lamb</span>
+      <span class="f"><i class="bx"></i>Fish</span><span class="f"><i class="bx"></i>Salmon</span><span class="f"><i class="bx"></i>Shrimp</span>
+      <span class="f"><i class="bx"></i>Tuna</span><span class="f"><i class="bx"></i>Eggs</span><span class="f"><i class="bx"></i>Laban</span>
+      <span class="f"><i class="bx"></i>Greek yogurt</span><span class="f"><i class="bx"></i>Cottage cheese</span><span class="f"><i class="bx"></i>Halloumi</span>
+      <span class="f"><i class="bx"></i>Foul</span><span class="f"><i class="bx"></i>Lentils</span><span class="f"><i class="bx"></i>Hummus</span>
+      <span class="f"><i class="bx"></i>Protein shake</span>
+    </div></div>
+    <div class="group"><h3>Carbs</h3><div class="foods">
+      <span class="f"><i class="bx"></i>White rice</span><span class="f"><i class="bx"></i>Brown rice</span><span class="f"><i class="bx"></i>Machboos</span>
+      <span class="f"><i class="bx"></i>Biryani</span><span class="f"><i class="bx"></i>Harees</span><span class="f"><i class="bx"></i>Khubz</span>
+      <span class="f"><i class="bx"></i>Regag</span><span class="f"><i class="bx"></i>Khameer</span><span class="f"><i class="bx"></i>Chapati</span>
+      <span class="f"><i class="bx"></i>Toast</span><span class="f"><i class="bx"></i>Oats</span><span class="f"><i class="bx"></i>Pasta</span>
+      <span class="f"><i class="bx"></i>Potatoes</span><span class="f"><i class="bx"></i>Sweet potato</span><span class="f"><i class="bx"></i>Dates</span>
+      <span class="f"><i class="bx"></i>Cereal</span><span class="f"><i class="bx"></i>Balaleet</span>
+    </div></div>
+    <div class="group"><h3>Veg and fruit</h3><div class="foods">
+      <span class="f"><i class="bx"></i>Salad</span><span class="f"><i class="bx"></i>Cucumber</span><span class="f"><i class="bx"></i>Tomato</span>
+      <span class="f"><i class="bx"></i>Broccoli</span><span class="f"><i class="bx"></i>Spinach</span><span class="f"><i class="bx"></i>Carrots</span>
+      <span class="f"><i class="bx"></i>Zucchini</span><span class="f"><i class="bx"></i>Okra</span><span class="f"><i class="bx"></i>Green beans</span>
+      <span class="f"><i class="bx"></i>Banana</span><span class="f"><i class="bx"></i>Apple</span><span class="f"><i class="bx"></i>Berries</span>
+      <span class="f"><i class="bx"></i>Mango</span><span class="f"><i class="bx"></i>Watermelon</span><span class="f"><i class="bx"></i>Orange</span>
+      <span class="f"><i class="bx"></i>Grapes</span>
+    </div></div>
+    <div class="group"><h3>Fats and extras</h3><div class="foods">
+      <span class="f"><i class="bx"></i>Olive oil</span><span class="f"><i class="bx"></i>Peanut butter</span><span class="f"><i class="bx"></i>Nuts</span>
+      <span class="f"><i class="bx"></i>Avocado</span><span class="f"><i class="bx"></i>Cheese</span><span class="f"><i class="bx"></i>Ghee</span>
+      <span class="f"><i class="bx"></i>Butter</span><span class="f"><i class="bx"></i>Tahini</span>
+    </div></div>
+  </div>
+  <div class="q" style="margin-top:9px"><span class="qlabel">Anything you love that's not on the list?</span><div class="rule"></div></div>
+  <div class="q"><span class="qlabel">Anything you'll never eat?</span><div class="rule"></div></div>
+</section>
+<div class="cols" style="margin-top:4px">
+<section style="border-top:0;padding-top:0">
+  <h2>Habits</h2>
+  <div class="q"><span class="qlabel">Your weak spots</span>
+    <div class="opts">
+      <span class="o"><i class="box"></i>Chocolate</span><span class="o"><i class="box"></i>Luqaimat</span>
+      <span class="o"><i class="box"></i>Kunafa</span><span class="o"><i class="box"></i>Ice cream</span>
+      <span class="o"><i class="box"></i>Biscuits</span><span class="o"><i class="box"></i>Chips</span>
+      <span class="o"><i class="box"></i>Cake</span><span class="o"><i class="box"></i>Fast food</span>
+      <span class="o"><i class="box"></i>None</span>
+    </div>
+  </div>
+  <div class="q"><span class="qlabel">Do you fast?</span>
+    <div class="opts"><span class="o"><i class="box round"></i>No</span><span class="o"><i class="box round"></i>Monday and Thursday</span>
+    <span class="o"><i class="box round"></i>Intermittent fasting</span><span class="o"><i class="box round"></i>Sometimes</span></div>
+  </div>
+  <div class="q"><span class="qlabel">Supplements you take</span>
+    <div class="opts">
+      <span class="o"><i class="box"></i>None</span><span class="o"><i class="box"></i>Protein</span>
+      <span class="o"><i class="box"></i>Creatine</span><span class="o"><i class="box"></i>Multivitamin</span>
+      <span class="o"><i class="box"></i>Vitamin D</span><span class="o"><i class="box"></i>Omega 3</span>
+      <span class="o"><i class="box"></i>Electrolytes</span>
+    </div>
+  </div>
+  </section>
+<section style="border-top:0;padding-top:0">
+  <h2>Anything else</h2>
+  <div class="q"><span class="qlabel">What's the hardest part with food for you?</span>
+    <div class="rules"><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div></div>
+  </div>
+  <div class="q"><span class="qlabel">Anything else I should know?</span>
+    <div class="rules"><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div><div class="rule"></div></div>
+  </div>
+</section>
+
+
+</div>
+</div>
+<div class="send">
+  <h2>Send it to me</h2>
+  <p>Snap a photo of both pages and send it on WhatsApp, or fill it in online and hit send.</p>
+  <p class="wa">WhatsApp &nbsp;+971 55 102 0952</p>
+</div>
+
+<footer>The Endurance Lab &middot; Coach Khalid</footer>
+
+</body></html>
