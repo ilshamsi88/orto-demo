@@ -26,9 +26,17 @@ function pseudoBusy(date: string, time: string): boolean {
   return seed % 7 === 0
 }
 
-export function slotsFor(date: string, bookings: Booking[], durationMins: number): Slot[] {
+export function slotsFor(
+  date: string,
+  bookings: Booking[],
+  durationMins: number,
+  /** Booking being rescheduled — it must not block its own current slot. */
+  excludeBookingId?: string,
+): Slot[] {
   const taken = new Set(
-    bookings.filter((b) => b.date === date && b.status !== 'Completed').map((b) => b.time),
+    bookings
+      .filter((b) => b.date === date && b.status !== 'Completed' && b.id !== excludeBookingId)
+      .map((b) => b.time),
   )
   const slots: Slot[] = []
   const now = Date.now()

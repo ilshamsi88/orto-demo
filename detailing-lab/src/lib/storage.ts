@@ -10,12 +10,15 @@ export function loadState(): AppState {
     if (!raw) return INITIAL_STATE
     const parsed = JSON.parse(raw) as Partial<AppState>
     return {
+      city: parsed.city ?? INITIAL_STATE.city,
       customer: parsed.customer ?? null,
       cars: parsed.cars ?? [],
       locations: parsed.locations ?? [],
-      // Services and add-ons are editable in admin, but a fresh install gets the seed.
-      services: parsed.services?.length ? parsed.services : INITIAL_STATE.services,
-      addOns: parsed.addOns?.length ? parsed.addOns : INITIAL_STATE.addOns,
+      // `??`, not a truthiness check on length: an owner who deliberately deletes
+      // every service in admin must not have the seed list reappear on reload.
+      // Only genuinely absent keys (older or corrupt saves) fall back to the seed.
+      services: parsed.services ?? INITIAL_STATE.services,
+      addOns: parsed.addOns ?? INITIAL_STATE.addOns,
       bookings: parsed.bookings ?? INITIAL_STATE.bookings,
     }
   } catch {

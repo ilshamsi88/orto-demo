@@ -52,7 +52,12 @@ with no browser chrome — the fastest way to make a web demo feel native.
 **Profile → Settings → Open Admin Dashboard**, or go straight to `/admin`.
 
 Statuses run **Confirmed → On the Way → Arrived → Washing → Completed**. Changing a
-status in Admin updates the customer's view immediately.
+status in Admin updates the customer's view immediately, and shows up in the
+customer's notifications.
+
+The home header's city selector and notification bell are both live. Notifications are
+derived from the bookings themselves rather than a separate feed, so they stay truthful
+as statuses change; tapping one opens that booking.
 
 ---
 

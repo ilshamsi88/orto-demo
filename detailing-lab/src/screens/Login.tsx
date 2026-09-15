@@ -6,7 +6,7 @@ import { NavBar } from '../components/Layout'
 import { useApp } from '../store/AppContext'
 
 export default function Login() {
-  const { signIn } = useApp()
+  const { signIn, bookings } = useApp()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const [mode, setMode] = useState<'signup' | 'login'>(
@@ -27,9 +27,16 @@ export default function Login() {
       setError(mode === 'login' ? 'Enter your phone number' : 'Enter your name and phone number')
       return
     }
+    const normalised = `+971 ${phone.replace(/^(\+?971)?\s*/, '').trim()}`
+
+    // Logging in only asks for a phone number, so recover the name from this
+    // customer's own past bookings rather than falling back to "Guest".
+    const digits = (v: string) => v.replace(/\D/g, '')
+    const previous = bookings.find((b) => digits(b.customerPhone) === digits(normalised))
+
     signIn({
-      name: mode === 'login' ? name.trim() || 'Guest' : name.trim(),
-      phone: `+971 ${phone.replace(/^(\+?971)?\s*/, '').trim()}`,
+      name: mode === 'login' ? name.trim() || previous?.customerName || 'Guest' : name.trim(),
+      phone: normalised,
       email: email.trim() || undefined,
     })
     navigate('/home', { replace: true })

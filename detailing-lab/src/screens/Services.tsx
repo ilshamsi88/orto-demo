@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import StatusBar from '../components/StatusBar'
-import { NavBar, Photo, Screen } from '../components/Layout'
-import { ChevronRight, Sparkle } from '../components/Icons'
+import { EmptyState, NavBar, Photo, Screen } from '../components/Layout'
+import { ChevronRight, Droplet, Sparkle } from '../components/Icons'
 import { useApp } from '../store/AppContext'
 import { imageFor } from '../data/images'
 import { aed } from '../lib/format'
@@ -18,16 +18,20 @@ const FILTERS: { key: Filter; label: string }[] = [
 ]
 
 export default function Services() {
-  const { services, addOns, resetDraft, setDraft } = useApp()
+  const { services, addOns, setDraft } = useApp()
   const navigate = useNavigate()
   const [filter, setFilter] = useState<Filter>('all')
 
   const visible = filter === 'addons' ? [] : services.filter((s) => filter === 'all' || s.category === filter)
-  const showAddOns = filter === 'all' || filter === 'addons'
+  const showAddOns = (filter === 'all' || filter === 'addons') && addOns.length > 0
+  const nothingToShow = visible.length === 0 && !showAddOns
 
   function choose(serviceId: string) {
-    resetDraft()
-    setDraft({ serviceId })
+    // Keep the vehicle and address the customer already entered, but drop any
+    // chosen time (a longer service may no longer fit it) and any abandoned
+    // reschedule, which would otherwise move an existing booking instead of
+    // creating a new one.
+    setDraft({ serviceId, time: undefined, rescheduleId: undefined })
     navigate('/book/service')
   }
 
@@ -51,6 +55,18 @@ export default function Services() {
             </button>
           ))}
         </div>
+
+        {nothingToShow && (
+          <EmptyState
+            icon={<Droplet className="h-7 w-7" />}
+            title="Nothing here yet"
+            body={
+              filter === 'all' || filter === 'addons'
+                ? 'No services are set up yet. Add them under Admin → Services.'
+                : `No ${filter} services right now. Try another category.`
+            }
+          />
+        )}
 
         <div className="space-y-2.5 px-5 pt-4">
           {visible.map((s) => (
@@ -85,9 +101,11 @@ export default function Services() {
                 <div className="min-w-0 flex-1">
                   <div className="text-[15px] font-semibold text-white">Add-ons</div>
                   <div className="mt-1 text-[12.5px] text-white/40">Enhance your service</div>
-                  <div className="mt-1.5 text-[13px] font-semibold text-blush-400">
-                    From {aed(Math.min(...addOns.map((a) => a.price)))}
-                  </div>
+                  {addOns.length > 0 && (
+                    <div className="mt-1.5 text-[13px] font-semibold text-blush-400">
+                      From {aed(Math.min(...addOns.map((a) => a.price)))}
+                    </div>
+                  )}
                 </div>
               </div>
               <ul className="divide-y divide-ink-700/50 border-t border-ink-700/50">

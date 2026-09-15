@@ -10,7 +10,7 @@ import { geocode } from '../lib/geocode'
 const LABELS = ['Home', 'Office', 'Other']
 
 export default function BookLocation() {
-  const { locations, addLocation, draft, setDraft } = useApp()
+  const { locations, addLocation, draft, setDraft, city } = useApp()
   const navigate = useNavigate()
 
   const existing = locations.find((l) => l.id === draft.locationId)
@@ -20,7 +20,7 @@ export default function BookLocation() {
   const [point, setPoint] = useState<LatLng>(
     existing ? { lat: existing.lat, lng: existing.lng } : DEFAULT_CENTER,
   )
-  const [placeName, setPlaceName] = useState(existing?.label ?? 'Dubai Marina')
+  const [placeName, setPlaceName] = useState(existing?.label ?? 'Drop a pin')
   const [searching, setSearching] = useState(false)
   const [searchNote, setSearchNote] = useState('')
 
@@ -140,7 +140,7 @@ export default function BookLocation() {
             <div className="text-[12.5px] font-semibold leading-tight text-ink-950">
               {placeName}
             </div>
-            <div className="text-[10.5px] leading-tight text-ink-950/55">Dubai, UAE</div>
+            <div className="text-[10.5px] leading-tight text-ink-950/55">{city}, UAE</div>
           </div>
         </div>
 

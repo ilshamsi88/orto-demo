@@ -152,6 +152,7 @@ const SAMPLE_BOOKINGS: Booking[] = [
 ]
 
 export const INITIAL_STATE: AppState = {
+  city: 'Dubai',
   customer: null,
   cars: [],
   locations: [],

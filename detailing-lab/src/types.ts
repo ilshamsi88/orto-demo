@@ -92,8 +92,12 @@ export interface Customer {
   email?: string
 }
 
+export const CITIES = ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman'] as const
+export type City = (typeof CITIES)[number]
+
 /** Everything the demo persists between sessions. */
 export interface AppState {
+  city: City
   customer: Customer | null
   cars: Car[]
   locations: AppLocation[]

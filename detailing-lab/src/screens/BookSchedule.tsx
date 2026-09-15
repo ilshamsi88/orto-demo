@@ -19,8 +19,8 @@ export default function BookSchedule() {
   const durationMins = rescheduling?.service.durationMins ?? service?.durationMins ?? 60
 
   const slots = useMemo(
-    () => slotsFor(selectedDate, bookings, durationMins),
-    [selectedDate, bookings, durationMins],
+    () => slotsFor(selectedDate, bookings, durationMins, rescheduling?.id),
+    [selectedDate, bookings, durationMins, rescheduling?.id],
   )
 
   if (!service && !rescheduling) return <Navigate to="/services" replace />

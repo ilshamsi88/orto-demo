@@ -15,6 +15,7 @@ import type {
   Booking,
   BookingStatus,
   Car,
+  City,
   Customer,
   PaymentMethod,
   Service,
@@ -50,6 +51,7 @@ interface AppContextValue extends AppState {
   resetDraft: () => void
   toggleAddOn: (id: string) => void
 
+  setCity: (city: City) => void
   signIn: (customer: Customer) => void
   signOut: () => void
   updateCustomer: (patch: Partial<Customer>) => void
@@ -142,6 +144,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toggleAddOn,
       priceFor,
 
+      setCity: (city) => setState((s) => ({ ...s, city })),
       signIn: (customer) => setState((s) => ({ ...s, customer })),
       signOut: () => setState((s) => ({ ...s, customer: null })),
       updateCustomer: (patch) =>
