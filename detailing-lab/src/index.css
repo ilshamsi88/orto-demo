@@ -1,0 +1,104 @@
+@import 'leaflet/dist/leaflet.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+/* iOS feel: no text selection or tap highlight on chrome, but keep it in inputs */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+input,
+textarea,
+select {
+  -webkit-user-select: text;
+  user-select: text;
+  font-size: 16px; /* stops iOS zoom-on-focus */
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-ink-700/70 bg-ink-850;
+  }
+  .field {
+    @apply w-full rounded-xl border border-ink-700 bg-ink-800 px-4 py-3.5 text-[16px] text-white
+           placeholder:text-white/30 outline-none transition
+           focus:border-aqua-500/60 focus:ring-2 focus:ring-aqua-500/20;
+  }
+  .label {
+    @apply mb-1.5 block text-[13px] font-medium text-white/50;
+  }
+  .btn-primary {
+    @apply flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-4 text-[16px]
+           font-semibold text-ink-950 transition active:scale-[0.985] disabled:opacity-30;
+  }
+  .btn-ghost {
+    @apply flex w-full items-center justify-center gap-2 rounded-2xl border border-ink-700 bg-ink-850
+           px-5 py-4 text-[16px] font-semibold text-white transition active:scale-[0.985];
+  }
+  .hairline {
+    @apply border-b border-ink-700/60;
+  }
+}
+
+/* Hide scrollbars but keep scrolling — closer to native */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Leaflet dark treatment */
+.leaflet-container {
+  background: #0c0d11;
+  font-family: inherit;
+}
+.leaflet-tile {
+  filter: brightness(0.65) saturate(0.6) contrast(1.05) invert(0.92) hue-rotate(180deg);
+}
+.leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.55) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 9px !important;
+}
+.leaflet-control-attribution a {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-sheet {
+  animation: sheet-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop {
+  animation: pop 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
