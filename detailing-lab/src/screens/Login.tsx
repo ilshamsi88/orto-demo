@@ -1,16 +1,20 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Logo from '../components/Logo'
+import StatusBar from '../components/StatusBar'
+import { NavBar } from '../components/Layout'
 import { useApp } from '../store/AppContext'
-import { Sparkle } from '../components/Icons'
 
-/** Phone-first sign-in: no passwords, matching how the shop already talks to customers. */
 export default function Login() {
   const { signIn } = useApp()
   const navigate = useNavigate()
-  const [mode, setMode] = useState<'signup' | 'login'>('signup')
+  const [params] = useSearchParams()
+  const [mode, setMode] = useState<'signup' | 'login'>(
+    params.get('mode') === 'login' ? 'login' : 'signup',
+  )
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [error, setError] = useState('')
 
   const digits = phone.replace(/\D/g, '')
@@ -26,43 +30,35 @@ export default function Login() {
     signIn({
       name: mode === 'login' ? name.trim() || 'Guest' : name.trim(),
       phone: `+971 ${phone.replace(/^(\+?971)?\s*/, '').trim()}`,
+      email: email.trim() || undefined,
     })
     navigate('/home', { replace: true })
   }
 
   return (
-    <div
-      className="no-scrollbar relative flex-1 overflow-y-auto"
-      style={{ paddingTop: 'var(--safe-top)', paddingBottom: 'var(--safe-bottom)' }}
-    >
-      {/* Ambient brand glow */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(120%_70%_at_50%_0%,rgba(34,211,238,0.16),transparent_70%)]" />
+    <div className="flex h-full flex-col">
+      <StatusBar />
+      <NavBar back={() => navigate('/welcome')} />
 
-      <div className="relative flex min-h-full flex-col px-6 pb-8 pt-14">
-        <Logo size="lg" />
+      <div className="no-scrollbar flex-1 overflow-y-auto px-6 pb-8">
+        <Logo compact />
 
-        <div className="mt-11">
-          <h1 className="text-[30px] font-bold leading-[1.15] tracking-tight text-white">
-            {mode === 'signup' ? (
-              <>
-                A spotless car,
-                <br />
-                <span className="text-white/45">without leaving the house.</span>
-              </>
-            ) : (
-              <>
-                Welcome back.
-                <br />
-                <span className="text-white/45">Let's get you booked.</span>
-              </>
-            )}
-          </h1>
-          <p className="mt-3.5 text-[15px] leading-relaxed text-white/45">
-            We come to you — home, office or valet. Book in under a minute.
-          </p>
-        </div>
+        <h1 className="mt-8 text-[27px] font-bold leading-tight tracking-tight text-white">
+          {mode === 'signup' ? (
+            <>
+              Create your <span className="text-blush-400">account</span>
+            </>
+          ) : (
+            <>
+              Welcome <span className="text-blush-400">back</span>
+            </>
+          )}
+        </h1>
+        <p className="mt-2 text-[14px] leading-relaxed text-white/45">
+          We come to you — home, office or valet. Book in under a minute.
+        </p>
 
-        <form onSubmit={submit} className="mt-9 space-y-4">
+        <form onSubmit={submit} className="mt-8 space-y-4">
           {mode === 'signup' && (
             <div>
               <label className="label" htmlFor="name">
@@ -71,7 +67,7 @@ export default function Login() {
               <input
                 id="name"
                 className="field"
-                placeholder="e.g. Ahmed Al Mansoori"
+                placeholder="e.g. Mohammed Al Suwaidi"
                 autoComplete="name"
                 value={name}
                 onChange={(e) => {
@@ -105,9 +101,26 @@ export default function Login() {
             </div>
           </div>
 
+          {mode === 'signup' && (
+            <div>
+              <label className="label" htmlFor="email">
+                Email <span className="font-normal opacity-60">(optional)</span>
+              </label>
+              <input
+                id="email"
+                className="field"
+                placeholder="you@example.com"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          )}
+
           {error && <p className="text-[13.5px] text-rose-400">{error}</p>}
 
-          <button type="submit" className="btn-primary !mt-6" disabled={!valid}>
+          <button type="submit" className="btn-primary !mt-7" disabled={!valid}>
             {mode === 'signup' ? 'Create account' : 'Log in'}
           </button>
         </form>
@@ -117,25 +130,19 @@ export default function Login() {
             setMode(mode === 'signup' ? 'login' : 'signup')
             setError('')
           }}
-          className="mt-5 py-2 text-center text-[14.5px] text-white/50 transition active:opacity-60"
+          className="mt-5 w-full py-2 text-center text-[14px] text-white/45 transition active:opacity-60"
         >
           {mode === 'signup' ? (
             <>
-              Already have an account? <span className="font-semibold text-aqua-400">Log in</span>
+              Already have an account?{' '}
+              <span className="font-semibold text-blush-400">Log in</span>
             </>
           ) : (
             <>
-              New here? <span className="font-semibold text-aqua-400">Create an account</span>
+              New here? <span className="font-semibold text-blush-400">Create an account</span>
             </>
           )}
         </button>
-
-        <div className="mt-auto pt-10">
-          <div className="flex items-center justify-center gap-2 text-[12.5px] text-white/30">
-            <Sparkle className="h-4 w-4" />
-            Trusted by 1,200+ drivers across Dubai
-          </div>
-        </div>
       </div>
     </div>
   )

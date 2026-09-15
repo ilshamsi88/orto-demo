@@ -1,4 +1,5 @@
 import type { Booking } from '../types'
+import { PAYMENT_LABELS } from '../types'
 import { aed, longDate, mapsLink, time12 } from './format'
 
 /**
@@ -44,6 +45,9 @@ export function buildMessage(b: Booking): string {
     `📱 Phone: ${b.customerPhone}`,
     '',
     `🧴 Service: ${b.service.name}`,
+    b.addOns.length
+      ? `➕ Add-ons: ${b.addOns.map((a) => `${a.name} (${aed(a.price)})`).join(', ')}`
+      : '',
     `🚗 Car: ${b.car.makeModel} (${b.car.type}, ${b.car.color})`,
     `🔢 Plate: ${b.car.plate}`,
     '',
@@ -55,6 +59,7 @@ export function buildMessage(b: Booking): string {
     b.location.notes ? `📝 Notes: ${b.location.notes}` : '',
     '',
     `💰 Total: *${aed(b.total)}*`,
+    `💳 Payment: ${PAYMENT_LABELS[b.paymentMethod]}`,
   ]
     .filter(Boolean)
     .join('\n')

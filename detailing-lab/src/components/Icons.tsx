@@ -123,3 +123,138 @@ export const Crosshair = (p: P) => (
     <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
   </svg>
 )
+
+export const Bell = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M18 8a6 6 0 10-12 0c0 6-2.5 7.5-2.5 7.5h17S18 14 18 8z" />
+    <path d="M10.3 19.5a2 2 0 003.4 0" />
+  </svg>
+)
+export const ChevronDown = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M6 9l6 6 6-6" />
+  </svg>
+)
+export const ArrowRight = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M4 12h15M13 6l6 6-6 6" />
+  </svg>
+)
+export const Search = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="M20 20l-3.5-3.5" />
+  </svg>
+)
+export const Leaf = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M4 20c0-8 6-14 16-15 0 10-5 15-11 15a5 5 0 01-5-5z" />
+    <path d="M9 15c2-3 5-5 8-6" />
+  </svg>
+)
+export const Shield = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M12 3l7 3v6c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V6l7-3z" />
+  </svg>
+)
+export const Badge = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="9" r="5.5" />
+    <path d="M8.5 13.5L7 21l5-2.5L17 21l-1.5-7.5" />
+  </svg>
+)
+export const CalendarPlus = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="5" width="18" height="16" rx="3" />
+    <path d="M8 3v4M16 3v4M3 10h18M12 13.5v5M9.5 16h5" />
+  </svg>
+)
+export const Grid = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
+    <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
+    <rect x="13.5" y="13.5" width="7" height="7" rx="2" />
+  </svg>
+)
+export const Tag = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M3.5 11.5V4.5a1 1 0 011-1h7l8.5 8.5a1.5 1.5 0 010 2.1l-5.9 5.9a1.5 1.5 0 01-2.1 0L3.5 11.5z" />
+    <circle cx="8" cy="8" r="1.4" />
+  </svg>
+)
+export const Help = (p: P) => (
+  <svg {...base} {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.6 9.3a2.5 2.5 0 114 2.4c-.9.6-1.6 1.1-1.6 2.1" />
+    <circle cx="12" cy="17" r="0.7" fill="currentColor" />
+  </svg>
+)
+export const Wallet = (p: P) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="6" width="18" height="13" rx="3" />
+    <path d="M3 10h18M16.5 14.5h1.5" />
+  </svg>
+)
+export const Bookmark = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M6.5 3.5h11a1 1 0 011 1v16l-6.5-4-6.5 4v-16a1 1 0 011-1z" />
+  </svg>
+)
+export const X = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+)
+export const Rotate = (p: P) => (
+  <svg {...base} {...p}>
+    <path d="M20.5 12a8.5 8.5 0 11-2.6-6.1" />
+    <path d="M20.5 4v5h-5" />
+  </svg>
+)
+
+/* --- Vehicle type glyphs, drawn as small side profiles --- */
+const carBase = {
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.5,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  viewBox: '0 0 40 24',
+}
+export const Sedan = (p: P) => (
+  <svg {...carBase} {...p}>
+    <path d="M3 16.5l2.5-5.5 4-3.5h13l5.5 4.5 8 1.5c1.2.3 2 1.2 2 2.4v.6" />
+    <path d="M3 16.5h34" />
+    <path d="M12 7.5v3.5M22.5 7.5l5.5 3.5H12" />
+    <circle cx="12" cy="17.5" r="3" />
+    <circle cx="29" cy="17.5" r="3" />
+  </svg>
+)
+export const Suv = (p: P) => (
+  <svg {...carBase} {...p}>
+    <path d="M3 16.5V11l4-4.5h16l6 4.5 8 1.5c1.2.3 2 1.2 2 2.4v1.6" />
+    <path d="M3 16.5h34" />
+    <path d="M13 6.5V11M23 6.5l6 4.5H7" />
+    <circle cx="12" cy="17.5" r="3" />
+    <circle cx="30" cy="17.5" r="3" />
+  </svg>
+)
+export const FourByFour = (p: P) => (
+  <svg {...carBase} {...p}>
+    <path d="M2 15V9.5l4.5-5h17l6.5 5h6c1.2 0 2 .9 2 2.1V15" />
+    <path d="M2 15h36" />
+    <path d="M13.5 4.5V9.5M24 4.5l6 5H6.5" />
+    <circle cx="11.5" cy="16.5" r="4" />
+    <circle cx="30" cy="16.5" r="4" />
+  </svg>
+)
+export const OtherVehicle = (p: P) => (
+  <svg {...carBase} {...p}>
+    <path d="M3 16.5V8.5a2 2 0 012-2h17l7 5h4a2 2 0 012 2v3" />
+    <path d="M3 16.5h34" />
+    <path d="M14 6.5v4.5M22 6.5l7 4.5H5" />
+    <circle cx="12" cy="17.5" r="3" />
+    <circle cx="30" cy="17.5" r="3" />
+  </svg>
+)

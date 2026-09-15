@@ -16,7 +16,7 @@ export function DetailRow({
 }) {
   return (
     <div className="flex items-start gap-3.5 px-4 py-3.5">
-      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-ink-700 bg-ink-800 text-aqua-400">
+      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-ink-700 bg-ink-800 text-blush-400">
         {icon}
       </span>
       <div className="min-w-0 flex-1">
@@ -27,7 +27,7 @@ export function DetailRow({
       {editTo ? (
         <Link
           to={editTo}
-          className="shrink-0 pt-1 text-[13px] font-semibold text-aqua-400 active:opacity-60"
+          className="shrink-0 pt-1 text-[13px] font-semibold text-blush-400 active:opacity-60"
         >
           Edit
         </Link>

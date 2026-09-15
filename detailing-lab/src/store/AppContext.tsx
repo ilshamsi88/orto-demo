@@ -9,53 +9,70 @@ import {
   type ReactNode,
 } from 'react'
 import type {
+  AddOn,
   AppLocation,
   AppState,
   Booking,
   BookingStatus,
   Car,
   Customer,
+  PaymentMethod,
   Service,
 } from '../types'
 import { SIZE_SURCHARGE } from '../types'
 import { clearState, loadState, saveState, uid } from '../lib/storage'
 import { INITIAL_STATE } from '../data/seed'
 
-/** In-progress booking, held while the customer walks through the flow. */
+/** In-progress booking, held while the customer walks through the five steps. */
 export interface BookingDraft {
   serviceId?: string
+  addOnIds?: string[]
   carId?: string
   locationId?: string
   date?: string
   time?: string
+  paymentMethod?: PaymentMethod
+  /** Set when an existing booking is being moved rather than a new one created. */
+  rescheduleId?: string
+}
+
+export interface PriceBreakdown {
+  base: number
+  surcharge: number
+  addOnTotal: number
+  addOns: AddOn[]
+  total: number
 }
 
 interface AppContextValue extends AppState {
   draft: BookingDraft
   setDraft: (patch: Partial<BookingDraft>) => void
   resetDraft: () => void
+  toggleAddOn: (id: string) => void
 
   signIn: (customer: Customer) => void
   signOut: () => void
   updateCustomer: (patch: Partial<Customer>) => void
 
   addCar: (car: Omit<Car, 'id'>) => Car
-  updateCar: (id: string, patch: Partial<Car>) => void
   removeCar: (id: string) => void
 
   addLocation: (loc: Omit<AppLocation, 'id'>) => AppLocation
-  updateLocation: (id: string, patch: Partial<AppLocation>) => void
   removeLocation: (id: string) => void
 
   upsertService: (service: Service) => void
   removeService: (id: string) => void
+  upsertAddOn: (addOn: AddOn) => void
+  removeAddOn: (id: string) => void
 
-  createBooking: () => Booking
+  createBooking: (paymentMethod: PaymentMethod) => Booking
+  rescheduleBooking: (id: string, date: string, time: string) => Booking | undefined
+  cancelBooking: (id: string) => void
   setBookingStatus: (id: string, status: BookingStatus) => void
   markNotified: (id: string, channel: Booking['notifyChannel']) => void
   resetDemo: () => void
 
-  priceFor: (serviceId?: string, carId?: string) => { base: number; surcharge: number; total: number }
+  priceFor: (draft: BookingDraft) => PriceBreakdown
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
@@ -78,9 +95,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     saveState(state)
   }, [state])
 
-  // createBooking needs the freshest state without being re-created on each render.
-  // Synced in an effect (not during render) so the refs are never written mid-render;
-  // effects flush before any user event handler can read them.
+  // createBooking reads the freshest state without being re-created each render.
+  // Synced in effects, which flush before any user event handler can read them.
   const stateRef = useRef(state)
   const draftRef = useRef(draft)
   useEffect(() => {
@@ -96,12 +112,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const resetDraft = useCallback(() => setDraftState({}), [])
 
-  const priceFor = useCallback<AppContextValue['priceFor']>((serviceId, carId) => {
-    const s = stateRef.current.services.find((x) => x.id === serviceId)
-    const car = stateRef.current.cars.find((x) => x.id === carId)
-    const base = s?.price ?? 0
+  const toggleAddOn = useCallback((id: string) => {
+    setDraftState((d) => {
+      const current = d.addOnIds ?? []
+      return {
+        ...d,
+        addOnIds: current.includes(id) ? current.filter((x) => x !== id) : [...current, id],
+      }
+    })
+  }, [])
+
+  const priceFor = useCallback<AppContextValue['priceFor']>((d) => {
+    const snapshot = stateRef.current
+    const service = snapshot.services.find((x) => x.id === d.serviceId)
+    const car = snapshot.cars.find((x) => x.id === d.carId)
+    const addOns = snapshot.addOns.filter((a) => (d.addOnIds ?? []).includes(a.id))
+    const base = service?.price ?? 0
     const surcharge = car ? SIZE_SURCHARGE[car.type] : 0
-    return { base, surcharge, total: base + surcharge }
+    const addOnTotal = addOns.reduce((sum, a) => sum + a.price, 0)
+    return { base, surcharge, addOns, addOnTotal, total: base + surcharge + addOnTotal }
   }, [])
 
   const value = useMemo<AppContextValue>(
@@ -110,6 +139,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       draft,
       setDraft,
       resetDraft,
+      toggleAddOn,
       priceFor,
 
       signIn: (customer) => setState((s) => ({ ...s, customer })),
@@ -122,11 +152,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setState((s) => ({ ...s, cars: [...s.cars, created] }))
         return created
       },
-      updateCar: (id, patch) =>
-        setState((s) => ({
-          ...s,
-          cars: s.cars.map((c) => (c.id === id ? { ...c, ...patch } : c)),
-        })),
       removeCar: (id) => setState((s) => ({ ...s, cars: s.cars.filter((c) => c.id !== id) })),
 
       addLocation: (loc) => {
@@ -134,11 +159,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setState((s) => ({ ...s, locations: [...s.locations, created] }))
         return created
       },
-      updateLocation: (id, patch) =>
-        setState((s) => ({
-          ...s,
-          locations: s.locations.map((l) => (l.id === id ? { ...l, ...patch } : l)),
-        })),
       removeLocation: (id) =>
         setState((s) => ({ ...s, locations: s.locations.filter((l) => l.id !== id) })),
 
@@ -152,7 +172,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       removeService: (id) =>
         setState((s) => ({ ...s, services: s.services.filter((x) => x.id !== id) })),
 
-      createBooking: () => {
+      upsertAddOn: (addOn) =>
+        setState((s) => ({
+          ...s,
+          addOns: s.addOns.some((x) => x.id === addOn.id)
+            ? s.addOns.map((x) => (x.id === addOn.id ? addOn : x))
+            : [...s.addOns, addOn],
+        })),
+      removeAddOn: (id) => setState((s) => ({ ...s, addOns: s.addOns.filter((x) => x.id !== id) })),
+
+      createBooking: (paymentMethod) => {
         const snapshot = stateRef.current
         const d = draftRef.current
         const service = snapshot.services.find((x) => x.id === d.serviceId)
@@ -161,7 +190,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (!service || !car || !location || !d.date || !d.time || !snapshot.customer) {
           throw new Error('Booking is incomplete')
         }
+        const addOns = snapshot.addOns.filter((a) => (d.addOnIds ?? []).includes(a.id))
         const surcharge = SIZE_SURCHARGE[car.type]
+        const addOnTotal = addOns.reduce((sum, a) => sum + a.price, 0)
         const booking: Booking = {
           id: uid('bkg'),
           orderNumber: nextOrderNumber(snapshot.bookings),
@@ -172,19 +203,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
             name: service.name,
             price: service.price,
             durationMins: service.durationMins,
+            image: service.image,
           },
+          addOns,
           car,
           location,
           date: d.date,
           time: d.time,
           sizeSurcharge: surcharge,
-          total: service.price + surcharge,
+          total: service.price + surcharge + addOnTotal,
+          // Passed in explicitly: a setDraft() on the same click would not have
+          // flushed into draftRef by the time this runs.
+          paymentMethod,
           status: 'Confirmed',
           createdAt: new Date().toISOString(),
         }
         setState((s) => ({ ...s, bookings: [booking, ...s.bookings] }))
         return booking
       },
+
+      rescheduleBooking: (id, date, time) => {
+        const existing = stateRef.current.bookings.find((b) => b.id === id)
+        if (!existing) return undefined
+        const moved = { ...existing, date, time, status: 'Confirmed' as BookingStatus }
+        setState((s) => ({
+          ...s,
+          bookings: s.bookings.map((b) => (b.id === id ? moved : b)),
+        }))
+        return moved
+      },
+
+      cancelBooking: (id) =>
+        setState((s) => ({
+          ...s,
+          bookings: s.bookings.filter((b) => b.id !== id),
+        })),
 
       setBookingStatus: (id, status) =>
         setState((s) => ({
@@ -206,7 +259,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setDraftState({})
       },
     }),
-    [state, draft, setDraft, resetDraft, priceFor],
+    [state, draft, setDraft, resetDraft, toggleAddOn, priceFor],
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

@@ -1,16 +1,16 @@
-export type CarType = 'Sedan' | 'SUV' | '4x4' | 'Coupe' | 'Pickup' | 'Van'
+export type CarType = 'Sedan' | 'SUV' | '4x4' | 'Other'
 
-export const CAR_TYPES: CarType[] = ['Sedan', 'SUV', '4x4', 'Coupe', 'Pickup', 'Van']
+export const CAR_TYPES: CarType[] = ['Sedan', 'SUV', '4x4', 'Other']
 
 /** Larger vehicles take longer and use more product. */
 export const SIZE_SURCHARGE: Record<CarType, number> = {
   Sedan: 0,
-  Coupe: 0,
   SUV: 30,
-  '4x4': 30,
-  Pickup: 40,
-  Van: 50,
+  '4x4': 40,
+  Other: 20,
 }
+
+export type ServiceCategory = 'wash' | 'detailing'
 
 export interface Service {
   id: string
@@ -19,8 +19,15 @@ export interface Service {
   includes: string[]
   price: number
   durationMins: number
+  category: ServiceCategory
+  image: string
   popular?: boolean
-  archived?: boolean
+}
+
+export interface AddOn {
+  id: string
+  name: string
+  price: number
 }
 
 export interface Car {
@@ -50,20 +57,31 @@ export const BOOKING_STATUSES = [
 
 export type BookingStatus = (typeof BOOKING_STATUSES)[number]
 
+export type PaymentMethod = 'card' | 'apple' | 'cash'
+
+export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
+  card: 'Credit / Debit Card',
+  apple: 'Apple Pay',
+  cash: 'Cash on Arrival',
+}
+
 export interface Booking {
   id: string
   orderNumber: string
   customerName: string
   customerPhone: string
-  service: Pick<Service, 'id' | 'name' | 'price' | 'durationMins'>
+  service: Pick<Service, 'id' | 'name' | 'price' | 'durationMins' | 'image'>
+  addOns: AddOn[]
   car: Car
   location: AppLocation
   date: string // yyyy-mm-dd
   time: string // HH:mm (24h)
   sizeSurcharge: number
   total: number
+  paymentMethod: PaymentMethod
   status: BookingStatus
   createdAt: string
+  cancelledAt?: string
   notifiedAt?: string
   notifyChannel?: 'link' | 'api' | 'simulated'
 }
@@ -71,6 +89,7 @@ export interface Booking {
 export interface Customer {
   name: string
   phone: string
+  email?: string
 }
 
 /** Everything the demo persists between sessions. */
@@ -79,5 +98,6 @@ export interface AppState {
   cars: Car[]
   locations: AppLocation[]
   services: Service[]
+  addOns: AddOn[]
   bookings: Booking[]
 }

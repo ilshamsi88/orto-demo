@@ -2,7 +2,7 @@ import { BOOKING_STATUSES, type BookingStatus } from '../types'
 import { Check } from './Icons'
 
 const STYLES: Record<BookingStatus, { dot: string; chip: string }> = {
-  Confirmed: { dot: 'bg-aqua-400', chip: 'bg-aqua-500/12 text-aqua-400 border-aqua-500/25' },
+  Confirmed: { dot: 'bg-blush-400', chip: 'bg-blush-400/10 text-blush-400 border-blush-400/35' },
   'On the Way': { dot: 'bg-amber-400', chip: 'bg-amber-400/12 text-amber-300 border-amber-400/25' },
   Arrived: { dot: 'bg-violet-400', chip: 'bg-violet-400/12 text-violet-300 border-violet-400/25' },
   Washing: { dot: 'bg-sky-400', chip: 'bg-sky-400/12 text-sky-300 border-sky-400/25' },
@@ -39,23 +39,23 @@ export function StatusTracker({ status }: { status: BookingStatus }) {
             {!last && (
               <span
                 className={`absolute left-[11px] top-6 h-full w-px ${
-                  done ? 'bg-aqua-500/60' : 'bg-ink-700'
+                  done ? 'bg-blush-400/60' : 'bg-ink-700'
                 }`}
               />
             )}
             <span
               className={`relative z-10 flex h-[23px] w-[23px] shrink-0 items-center justify-center rounded-full border-2 transition ${
                 done
-                  ? 'border-aqua-500 bg-aqua-500 text-ink-950'
+                  ? 'border-blush-500 bg-blush-500 text-ink-950'
                   : active
-                    ? 'border-aqua-400 bg-ink-950 text-aqua-400 shadow-glow'
+                    ? 'border-blush-400 bg-ink-950 text-blush-400 shadow-glow'
                     : 'border-ink-600 bg-ink-900'
               }`}
             >
               {done ? (
                 <Check className="h-3.5 w-3.5" strokeWidth={3} />
               ) : active ? (
-                <span className="h-2 w-2 rounded-full bg-aqua-400" />
+                <span className="h-2 w-2 rounded-full bg-blush-400" />
               ) : null}
             </span>
             <div className="pt-0.5">
@@ -67,7 +67,7 @@ export function StatusTracker({ status }: { status: BookingStatus }) {
                 {step}
               </div>
               {active && (
-                <div className="mt-0.5 text-[12.5px] text-aqua-400/80">Current status</div>
+                <div className="mt-0.5 text-[12.5px] text-blush-400/80">Current status</div>
               )}
             </div>
           </li>

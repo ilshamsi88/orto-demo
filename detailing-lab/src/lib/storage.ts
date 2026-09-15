@@ -1,7 +1,7 @@
 import type { AppState } from '../types'
 import { INITIAL_STATE } from '../data/seed'
 
-const KEY = 'detailing-lab:v1'
+const KEY = 'detailing-lab:v2'
 
 /** localStorage can throw in private mode, so every access is guarded. */
 export function loadState(): AppState {
@@ -13,8 +13,9 @@ export function loadState(): AppState {
       customer: parsed.customer ?? null,
       cars: parsed.cars ?? [],
       locations: parsed.locations ?? [],
-      // Services can be edited in admin, but a fresh install gets the seed list.
+      // Services and add-ons are editable in admin, but a fresh install gets the seed.
       services: parsed.services?.length ? parsed.services : INITIAL_STATE.services,
+      addOns: parsed.addOns?.length ? parsed.addOns : INITIAL_STATE.addOns,
       bookings: parsed.bookings ?? INITIAL_STATE.bookings,
     }
   } catch {

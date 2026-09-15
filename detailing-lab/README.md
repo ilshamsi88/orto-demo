@@ -6,6 +6,9 @@ show the business owner the full customer journey before committing to a product
 The headline feature: **the moment a customer confirms a booking, the owner gets a
 WhatsApp message with every detail of the job.**
 
+The UI follows the owner's supplied reference design — dark, rose-accented, photo-led,
+with a mock iOS status bar and a four-tab bottom bar.
+
 ---
 
 ## Run it
@@ -28,20 +31,25 @@ with no browser chrome — the fastest way to make a web demo feel native.
 
 ---
 
-## The demo journey
+## The screens
 
-1. **Sign up** — name + UAE phone number, no password
-2. **Home** — branding, "Book a Wash", service list, next appointment
-3. **Choose a service** — price, duration, expandable "what's included"
-4. **Your car** — make/model, type, plate, colour (saved for next time)
-5. **Location** — typed address, address lookup, drag-a-pin map, access notes
-6. **Pick a time** — 14-day strip, slots grouped by morning/afternoon/evening,
-   unavailable slots struck through
-7. **Summary** — everything in one place with an itemised price, each row editable
-8. **Checkout** — Apple Pay / card, clearly marked as a demo, nothing charged
-9. **Confirmed** — order number, and a receipt showing the owner's WhatsApp went out
-10. **My Bookings** — upcoming and previous, with live status
-11. **Admin** — every booking, one-tap status changes, editable services and prices
+| # | Screen | Route |
+|---|---|---|
+| 1 | Welcome — crest logo over a dark hero | `/welcome` |
+| 2 | Sign up / Log in — name + UAE phone | `/login` |
+| 3 | Home — city selector, hero, trust tiles | `/home` |
+| 4 | Services — category filter chips, photo rows | `/services` |
+| 5 | Book a Service (Step 1/5) — vehicle type, details, add-ons | `/book/service` |
+| 6 | Your Location (Step 2/5) — address search, map pin, notes | `/book/location` |
+| 7 | Date & Time (Step 3/5) — 14-day strip, slot grid | `/book/time` |
+| 8 | Payment (Step 4/5) — summary, card / Apple Pay / cash | `/book/payment` |
+| 9 | Booking Confirmed — order number, Add to Calendar | `/booking-confirmed/:id` |
+| 10 | My Bookings — upcoming / past, reschedule, cancel | `/bookings` |
+| 11 | Profile — avatar, saved data, settings | `/profile` |
+| — | Admin — shop-side dashboard | `/admin` |
+
+**Admin is deliberately not in the tab bar** — customers never see it. Reach it from
+**Profile → Settings → Open Admin Dashboard**, or go straight to `/admin`.
 
 Statuses run **Confirmed → On the Way → Arrived → Washing → Completed**. Changing a
 status in Admin updates the customer's view immediately.
@@ -67,21 +75,23 @@ The message the owner receives:
 🧼 *NEW BOOKING — Detailing Lab*
 Order: *DL-4904*
 
-👤 Customer: Omar Saeed
-📱 Phone: +971 55 900 1234
+👤 Customer: Mohammed Saeed
+📱 Phone: +971 50 771 4400
 
-🧴 Service: Premium Hand Wash & Wax
-🚗 Car: Mercedes G 63 (SUV, White)
+🧴 Service: Premium Wash
+➕ Add-ons: Engine Bay Clean (AED 49), Ceramic Wax (AED 149)
+🚗 Car: Mercedes G 63 (SUV, Black)
 🔢 Plate: D 71155
 
 📅 Date: Tuesday 15 September 2026
-⏰ Time: 1:30 PM
+⏰ Time: 2:30 PM
 
 📍 Location: Home — Marina Gate 2, Dubai Marina
 🗺️ Map: https://maps.google.com/?q=25.204800,55.270800
-📝 Notes: Gate on the left, white villa
+📝 Notes: Tower 2, basement P1
 
-💰 Total: *AED 250*
+💰 Total: *AED 377*
+💳 Payment: Cash on Arrival
 ```
 
 ### Making it fully automatic
@@ -93,32 +103,43 @@ Order: *DL-4904*
 
 ---
 
-## Deploying
+## Branding and imagery
 
-Vercel picks this up with no configuration (`vercel.json` handles SPA routing and the
-API route). Netlify works too — `public/_redirects` covers client-side routing, and
-`api/notify-whatsapp.js` needs moving to `netlify/functions/`.
+Two files own the entire look:
+
+- **`src/components/Logo.tsx`** — the circular crest wordmark. Replace the SVG with the
+  real logo file and the whole app updates; nothing else draws the brand.
+- **`src/data/images.ts`** — every image in the app resolves through one map of
+  generated SVG placeholders. Drop real photos into `public/img/` and change a value
+  to `'/img/premium-wash.jpg'`. No other file references an image path.
+
+Colours live in `tailwind.config.js` as the `blush` (rose accent) and `ink` (warm
+near-black) scales.
 
 ---
 
 ## What's real and what's demo
 
-**Real:** the whole customer journey, saved cars and addresses, map pin selection,
-availability logic, price calculation including vehicle-size supplements, status
-workflow, admin editing, WhatsApp message generation and delivery.
+**Real:** the whole customer journey, category filtering, priced add-ons, saved
+vehicles and addresses, map pin selection, availability logic, price calculation with
+vehicle-size supplements, reschedule and cancel, calendar export (.ics), the status
+workflow, admin editing of services and add-ons, and WhatsApp message generation and
+delivery.
 
 **Demo-only:**
 
-- **Payments.** The checkout screen is a visual mock. Nothing is charged, card fields
-  are disabled. Stripe, Telr or Network International would slot in here.
+- **Payments.** The checkout screen is a visual mock. Nothing is charged. Stripe, Telr
+  or Network International would slot in here.
 - **Storage.** State lives in the browser's `localStorage`, so each device has its own
   copy and the owner's admin view only shows bookings made on that device. A real
   build needs a shared backend — otherwise the shop can't see a customer's booking.
 - **Accounts.** No OTP or password. Real sign-in would verify the phone number by SMS.
-- **Availability.** Slots are generated from a fixed schedule plus existing bookings,
-  not from real staff rosters.
+- **Availability.** Slots come from a fixed schedule plus existing bookings, not from
+  real staff rosters.
+- **Address lookup.** Uses OpenStreetMap Nominatim (free, no key). Swap `src/lib/geocode.ts`
+  for the Google Geocoding API if UAE address quality matters.
 
-"Reset demo data" on the Profile tab wipes everything back to the seeded state —
+**Profile → Settings → Reset demo data** wipes everything back to the seeded state —
 useful between presentations.
 
 ---
@@ -128,12 +149,9 @@ useful between presentations.
 ```
 src/
   screens/      one file per screen
-  components/   layout shell, icons, map picker, status rail, shared rows
+  components/   layout shell, crest logo, status bar, icons, map picker, status rail
   store/        app state + localStorage persistence
-  lib/          WhatsApp adapter, geocoding, slot generation, formatting
-  data/seed.ts  services, prices, sample bookings
+  lib/          WhatsApp adapter, geocoding, slot generation, .ics export, formatting
+  data/         seed.ts (services, add-ons, sample bookings), images.ts (image map)
 api/            serverless WhatsApp sender
 ```
-
-Branding lives in one place — `src/components/Logo.tsx` and the `aqua` colours in
-`tailwind.config.js`. Swap those and the whole app re-skins.

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { BottomBar, Screen } from '../components/Layout'
-import { DetailRow, PriceRow } from '../components/DetailRow'
-import { Calendar, Car, Check, Droplet, Pin, WhatsApp } from '../components/Icons'
+import StatusBar from '../components/StatusBar'
+import { BottomBar, Photo, Screen } from '../components/Layout'
+import { CalendarPlus, Check, WhatsApp } from '../components/Icons'
 import { useApp } from '../store/AppContext'
-import { aed, longDate, time12 } from '../lib/format'
+import { imageFor } from '../data/images'
+import { aed, longDate, shortDate, time12 } from '../lib/format'
+import { downloadIcs } from '../lib/ics'
 import { buildMessage, notifyOwner, type NotifyResult } from '../lib/whatsapp'
 
 export default function Confirmation() {
@@ -40,28 +42,68 @@ export default function Confirmation() {
 
   return (
     <>
-      <Screen className="px-5" >
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[340px] bg-[radial-gradient(110%_60%_at_50%_0%,rgba(16,185,129,0.16),transparent_70%)]" />
-
-        <div
-          className="relative flex flex-col items-center pb-2 text-center"
-          style={{ paddingTop: 'calc(var(--safe-top) + 40px)' }}
-        >
-          <div className="animate-pop flex h-[76px] w-[76px] items-center justify-center rounded-full bg-emerald-400 shadow-[0_0_50px_-8px_rgba(52,211,153,0.6)]">
-            <Check className="h-10 w-10 text-ink-950" strokeWidth={3} />
+      <StatusBar />
+      <Screen withBottomBar className="px-5">
+        <div className="flex flex-col items-center pb-2 pt-10 text-center">
+          <div className="animate-pop flex h-[68px] w-[68px] items-center justify-center rounded-full bg-blush-400">
+            <Check className="h-9 w-9 text-ink-950" strokeWidth={3} />
           </div>
-          <h1 className="mt-6 text-[27px] font-bold tracking-tight text-white">Booking confirmed</h1>
-          <p className="mt-2 max-w-[280px] text-[14.5px] leading-relaxed text-white/50">
-            You're all set. We'll message you before the detailer sets off.
+          <h1 className="mt-6 text-[25px] font-bold tracking-tight text-blush-400">
+            Booking Confirmed!
+          </h1>
+          <p className="mt-2.5 max-w-[270px] text-[13.5px] leading-relaxed text-white/50">
+            Your car wash has been booked. We'll see you on{' '}
+            <span className="text-white">
+              {shortDate(booking.date)} at {time12(booking.time)}
+            </span>
+            .
           </p>
-          <div className="mt-4 rounded-full border border-ink-700 bg-ink-850 px-4 py-2 text-[13.5px] font-semibold tracking-wide text-white">
-            Order <span className="text-aqua-400">{booking.orderNumber}</span>
+        </div>
+
+        <div className="card mt-5 p-3.5">
+          <div className="flex items-center gap-3.5">
+            <Photo src={imageFor(booking.service.image)} className="h-[58px] w-[72px] shrink-0" />
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[15px] font-semibold text-white">
+                {booking.service.name}
+              </div>
+              <div className="mt-0.5 text-[12.5px] text-white/45">
+                {booking.car.type} · {booking.car.plate}
+              </div>
+              <div className="truncate text-[12.5px] text-white/45">
+                {booking.location.label} — {booking.location.address}
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 space-y-1.5 border-t border-ink-700/60 pt-3 text-[12.5px]">
+            <div className="flex justify-between">
+              <span className="text-white/40">Date &amp; time</span>
+              <span className="text-white/80">
+                {longDate(booking.date)}, {time12(booking.time)}
+              </span>
+            </div>
+            {booking.addOns.length > 0 && (
+              <div className="flex justify-between gap-4">
+                <span className="shrink-0 text-white/40">Add-ons</span>
+                <span className="text-right text-white/80">
+                  {booking.addOns.map((a) => a.name).join(', ')}
+                </span>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span className="text-white/40">Order number</span>
+              <span className="font-semibold text-blush-400">{booking.orderNumber}</span>
+            </div>
+            <div className="flex justify-between pt-1">
+              <span className="text-[14px] font-semibold text-white">Total</span>
+              <span className="text-[16px] font-bold text-white">{aed(booking.total)}</span>
+            </div>
           </div>
         </div>
 
-        {/* WhatsApp notification receipt — the owner-facing half of the flow */}
+        {/* WhatsApp receipt — the owner-facing half of the flow */}
         <div
-          className={`relative mt-7 rounded-2xl border p-4 ${
+          className={`mt-3 rounded-2xl border p-3.5 ${
             notify?.ok === false
               ? 'border-rose-400/30 bg-rose-400/[0.07]'
               : 'border-emerald-400/25 bg-emerald-400/[0.06]'
@@ -69,21 +111,23 @@ export default function Confirmation() {
         >
           <div className="flex items-start gap-3">
             <span
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                notify?.ok === false ? 'bg-rose-400/15 text-rose-300' : 'bg-emerald-400/15 text-emerald-300'
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                notify?.ok === false
+                  ? 'bg-rose-400/15 text-rose-300'
+                  : 'bg-emerald-400/15 text-emerald-300'
               }`}
             >
-              <WhatsApp className="h-5 w-5" />
+              <WhatsApp className="h-[18px] w-[18px]" />
             </span>
             <div className="min-w-0 flex-1">
-              <div className="text-[14.5px] font-semibold text-white">
+              <div className="text-[14px] font-semibold text-white">
                 {notify?.ok === false
                   ? 'WhatsApp notification failed'
                   : notify?.channel === 'simulated'
                     ? 'WhatsApp notification ready'
                     : 'Shop notified on WhatsApp'}
               </div>
-              <p className="mt-1 text-[12.5px] leading-relaxed text-white/50">
+              <p className="mt-0.5 text-[12px] leading-relaxed text-white/50">
                 {notify?.ok === false
                   ? notify.detail || 'Could not reach the notification service.'
                   : notify?.channel === 'link'
@@ -92,17 +136,17 @@ export default function Confirmation() {
                       ? 'Sent automatically to the shop owner with all booking details.'
                       : 'No owner number is configured yet — the exact message is below.'}
               </p>
-              <div className="mt-2.5 flex flex-wrap gap-4">
+              <div className="mt-2 flex flex-wrap gap-4">
                 <button
                   onClick={() => setShowMessage(!showMessage)}
-                  className="text-[13px] font-semibold text-aqua-400 active:opacity-60"
+                  className="text-[12.5px] font-semibold text-blush-400 active:opacity-60"
                 >
                   {showMessage ? 'Hide message' : 'View message'}
                 </button>
                 <button
                   onClick={resend}
                   disabled={resending}
-                  className="text-[13px] font-semibold text-aqua-400 active:opacity-60 disabled:opacity-40"
+                  className="text-[12.5px] font-semibold text-blush-400 active:opacity-60 disabled:opacity-40"
                 >
                   {resending ? 'Sending…' : 'Send again'}
                 </button>
@@ -111,55 +155,23 @@ export default function Confirmation() {
           </div>
 
           {showMessage && (
-            <pre className="animate-sheet mt-3.5 max-h-[260px] overflow-auto whitespace-pre-wrap rounded-xl border border-ink-700 bg-ink-950/70 p-3.5 font-sans text-[12.5px] leading-relaxed text-white/70">
+            <pre className="animate-sheet mt-3 max-h-[240px] overflow-auto whitespace-pre-wrap rounded-xl border border-ink-700 bg-ink-950/70 p-3.5 font-sans text-[12px] leading-relaxed text-white/70">
               {messagePreview}
             </pre>
           )}
         </div>
 
-        <div className="card mt-3 divide-y divide-ink-700/50 overflow-hidden">
-          <DetailRow
-            icon={<Droplet className="h-[18px] w-[18px]" />}
-            label="Service"
-            value={booking.service.name}
-          />
-          <DetailRow
-            icon={<Calendar className="h-[18px] w-[18px]" />}
-            label="Date & time"
-            value={time12(booking.time)}
-            sub={longDate(booking.date)}
-          />
-          <DetailRow
-            icon={<Pin className="h-[18px] w-[18px]" />}
-            label="Location"
-            value={booking.location.label}
-            sub={booking.location.address}
-          />
-          <DetailRow
-            icon={<Car className="h-[18px] w-[18px]" />}
-            label="Car"
-            value={booking.car.makeModel}
-            sub={`${booking.car.type} · ${booking.car.color} · Plate ${booking.car.plate}`}
-          />
-        </div>
-
-        <div className="card mt-3 p-4">
-          <PriceRow label="Total paid" value={aed(booking.total)} strong />
-        </div>
-
-        <div className="h-32" />
+        <div className="h-4" />
       </Screen>
 
       <BottomBar>
         <div className="space-y-2.5">
-          <button className="btn-primary" onClick={() => navigate(`/bookings/${booking.id}`)}>
-            Track this booking
+          <button className="btn-outline" onClick={() => downloadIcs(booking)}>
+            <CalendarPlus className="h-[18px] w-[18px]" />
+            Add to Calendar
           </button>
-          <button
-            className="w-full py-2 text-[14.5px] font-semibold text-white/50"
-            onClick={() => navigate('/home')}
-          >
-            Back to home
+          <button className="btn-primary" onClick={() => navigate('/bookings')}>
+            View Bookings
           </button>
         </div>
       </BottomBar>

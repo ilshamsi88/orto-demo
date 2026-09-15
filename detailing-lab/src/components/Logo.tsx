@@ -1,41 +1,106 @@
 interface LogoProps {
-  size?: 'sm' | 'md' | 'lg'
+  size?: number
   className?: string
+  /** Wordmark only, for tight headers. */
+  compact?: boolean
 }
 
 /**
- * Placeholder Detailing Lab wordmark + droplet mark.
- * Swap this component for the real logo file when the owner supplies it —
- * nothing else in the app references the brand directly.
+ * Detailing Lab crest — a circular badge wordmark.
+ * Placeholder: swap this component's SVG for the real logo file when supplied.
+ * Nothing else in the app draws the brand.
  */
-export default function Logo({ size = 'md', className = '' }: LogoProps) {
-  const dims = {
-    sm: { mark: 22, title: 'text-[13px]', sub: 'text-[8px] tracking-[0.34em]' },
-    md: { mark: 30, title: 'text-[17px]', sub: 'text-[9px] tracking-[0.38em]' },
-    lg: { mark: 46, title: 'text-[26px]', sub: 'text-[11px] tracking-[0.42em]' },
-  }[size]
-
-  return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <svg width={dims.mark} height={dims.mark} viewBox="0 0 48 48" aria-hidden="true">
-        <defs>
-          <linearGradient id="dl-mark" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#5EE7F5" />
-            <stop offset="1" stopColor="#0EA5BE" />
-          </linearGradient>
-        </defs>
-        <circle cx="24" cy="24" r="23" fill="none" stroke="url(#dl-mark)" strokeWidth="1.6" opacity="0.4" />
-        <path d="M24 10c0 0 10 11.6 10 18a10 10 0 11-20 0c0-6.4 10-18 10-18z" fill="url(#dl-mark)" />
-        <path d="M19 30a5 5 0 005 5" stroke="#07080A" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
-      </svg>
-      <div className="leading-none">
-        <div className={`font-semibold ${dims.title} text-white`}>
-          DETAILING <span className="text-aqua-400">LAB</span>
+export default function Logo({ size = 120, className = '', compact = false }: LogoProps) {
+  if (compact) {
+    return (
+      <div className={`leading-none ${className}`}>
+        <div className="font-display text-[19px] font-semibold tracking-[0.06em] text-white">
+          DETAILING<span className="text-blush-400">LAB</span>
         </div>
-        <div className={`mt-1 font-medium uppercase text-white/35 ${dims.sub}`}>
-          Precision Car Care
+        <div className="mt-1 text-[7.5px] font-medium uppercase tracking-[0.42em] text-white/35">
+          Premium Car Care
         </div>
       </div>
-    </div>
+    )
+  }
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 200 200"
+      className={className}
+      role="img"
+      aria-label="Detailing Lab"
+    >
+      <defs>
+        <path id="dl-arc-top" d="M 100,100 m -74,0 a 74,74 0 1,1 148,0" fill="none" />
+        <path id="dl-arc-bottom" d="M 100,100 m -78,0 a 78,78 0 1,0 156,0" fill="none" />
+      </defs>
+
+      <circle cx="100" cy="100" r="96" fill="none" stroke="#F2A9A0" strokeWidth="1" opacity="0.32" />
+      <circle cx="100" cy="100" r="88" fill="none" stroke="#F2A9A0" strokeWidth="1.6" opacity="0.7" />
+
+      <text
+        fill="#F2A9A0"
+        fontSize="11"
+        letterSpacing="5.2"
+        fontFamily="Georgia, serif"
+        opacity="0.85"
+      >
+        <textPath href="#dl-arc-top" startOffset="50%" textAnchor="middle">
+          PREMIUM CAR CARE
+        </textPath>
+      </text>
+
+      <text
+        fill="#F2A9A0"
+        fontSize="10"
+        letterSpacing="4.6"
+        fontFamily="Georgia, serif"
+        opacity="0.6"
+      >
+        <textPath href="#dl-arc-bottom" startOffset="50%" textAnchor="middle">
+          EST. 2025
+        </textPath>
+      </text>
+
+      <text
+        x="100"
+        y="92"
+        textAnchor="middle"
+        fill="#FFFFFF"
+        fontSize="25"
+        fontFamily="Georgia, serif"
+        letterSpacing="1.2"
+      >
+        DETAILING
+      </text>
+      <text
+        x="100"
+        y="118"
+        textAnchor="middle"
+        fill="#F2A9A0"
+        fontSize="25"
+        fontFamily="Georgia, serif"
+        letterSpacing="5"
+      >
+        LAB
+      </text>
+
+      <line x1="64" y1="128" x2="136" y2="128" stroke="#F2A9A0" strokeWidth="0.9" opacity="0.5" />
+      <text
+        x="100"
+        y="142"
+        textAnchor="middle"
+        fill="#FFFFFF"
+        fontSize="8.5"
+        letterSpacing="3.4"
+        opacity="0.55"
+        fontFamily="Georgia, serif"
+      >
+        CAR WASH / DETAILING
+      </text>
+    </svg>
   )
 }

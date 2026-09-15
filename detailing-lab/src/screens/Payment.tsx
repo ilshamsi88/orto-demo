@@ -1,49 +1,60 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { BottomBar, NavBar, Screen } from '../components/Layout'
-import { PriceRow } from '../components/DetailRow'
-import { Apple, Check, CreditCard, Lock } from '../components/Icons'
+import StatusBar from '../components/StatusBar'
+import { BottomBar, NavBar, Photo, Screen } from '../components/Layout'
+import { Apple, ArrowRight, Check, CreditCard, Wallet } from '../components/Icons'
 import { useApp } from '../store/AppContext'
-import { aed } from '../lib/format'
+import { PAYMENT_LABELS, type PaymentMethod } from '../types'
+import { imageFor } from '../data/images'
+import { aed, shortDate, time12 } from '../lib/format'
 import { notifyMode, notifyOwner } from '../lib/whatsapp'
 
-type Method = 'apple' | 'card'
+const METHODS: { key: PaymentMethod; Icon: typeof Apple; hint: string }[] = [
+  { key: 'card', Icon: CreditCard, hint: 'Visa, Mastercard, Amex' },
+  { key: 'apple', Icon: Apple, hint: 'Pay with Face ID' },
+  { key: 'cash', Icon: Wallet, hint: 'Pay the detailer on the day' },
+]
 
 export default function Payment() {
-  const { draft, priceFor, createBooking, markNotified, services, cars, locations } = useApp()
+  const {
+    draft,
+    priceFor,
+    createBooking,
+    markNotified,
+    services,
+    cars,
+    locations,
+  } = useApp()
   const navigate = useNavigate()
-  const [method, setMethod] = useState<Method>('apple')
+  const [method, setMethod] = useState<PaymentMethod>(draft.paymentMethod ?? 'card')
+  const [saveMethod, setSaveMethod] = useState(true)
   const [busy, setBusy] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
 
-  const ready =
-    services.some((s) => s.id === draft.serviceId) &&
-    cars.some((c) => c.id === draft.carId) &&
-    locations.some((l) => l.id === draft.locationId) &&
-    Boolean(draft.date && draft.time)
+  const service = services.find((s) => s.id === draft.serviceId)
+  const car = cars.find((c) => c.id === draft.carId)
+  const location = locations.find((l) => l.id === draft.locationId)
+  const ready = Boolean(service && car && location && draft.date && draft.time)
 
   // Guard against a refresh or deep link landing here with nothing to pay for —
   // but never after the booking has been placed, or we'd bounce off our own success.
-  if (!ready && !submitted) return <Navigate to="/book/service" replace />
+  if (!ready && !submitted) return <Navigate to="/services" replace />
 
-  const { base, surcharge, total } = priceFor(draft.serviceId, draft.carId)
+  const { base, surcharge, addOns, addOnTotal, total } = priceFor(draft)
 
-  async function confirmAndPay() {
+  async function confirm() {
     if (busy) return
     setBusy(true)
     setSubmitted(true)
     setError('')
     try {
-      // The booking becomes real here — this is the single confirmation point,
-      // and the owner's WhatsApp fires from the same user gesture.
-      const booking = createBooking()
+      // The booking becomes real here, and the owner's WhatsApp fires from the
+      // same user gesture so mobile Safari allows the handoff.
+      const booking = createBooking(method)
       const result = await notifyOwner(booking)
       markNotified(booking.id, result.channel)
-      navigate(`/booking-confirmed/${booking.id}`, {
-        replace: true,
-        state: { notify: result },
-      })
+      navigate(`/booking-confirmed/${booking.id}`, { replace: true, state: { notify: result } })
     } catch (err) {
       setBusy(false)
       setSubmitted(false)
@@ -53,127 +64,120 @@ export default function Payment() {
 
   return (
     <>
-      <NavBar title="Checkout" back />
-      <Screen className="px-5">
-        <div className="mt-1 flex items-start gap-2.5 rounded-xl border border-amber-400/25 bg-amber-400/[0.08] px-3.5 py-3 text-[12.5px] leading-relaxed text-amber-200/90">
-          <Lock className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>
-            <span className="font-semibold">Demo checkout.</span> No card is charged and no payment
-            details are stored. Live payments plug in here later.
-          </span>
-        </div>
-
-        <h2 className="mb-3 mt-6 text-[13px] font-semibold uppercase tracking-[0.14em] text-white/40">
-          Payment method
-        </h2>
-
-        <div className="space-y-2.5">
-          <button
-            onClick={() => setMethod('apple')}
-            className={`flex w-full items-center gap-3.5 rounded-2xl border p-4 text-left transition ${
-              method === 'apple'
-                ? 'border-aqua-500/60 bg-aqua-500/[0.07] shadow-glow'
-                : 'border-ink-700/70 bg-ink-850'
-            }`}
-          >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-ink-950">
-              <Apple className="h-6 w-6" />
-            </span>
-            <div className="flex-1">
-              <div className="text-[15.5px] font-semibold text-white">Apple Pay</div>
-              <div className="text-[13px] text-white/45">Fastest — pay with Face ID</div>
-            </div>
-            {method === 'apple' && (
-              <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-aqua-400">
-                <Check className="h-3.5 w-3.5 text-ink-950" strokeWidth={3.2} />
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setMethod('card')}
-            className={`flex w-full items-center gap-3.5 rounded-2xl border p-4 text-left transition ${
-              method === 'card'
-                ? 'border-aqua-500/60 bg-aqua-500/[0.07] shadow-glow'
-                : 'border-ink-700/70 bg-ink-850'
-            }`}
-          >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-ink-600 bg-ink-800 text-white/80">
-              <CreditCard className="h-5 w-5" />
-            </span>
-            <div className="flex-1">
-              <div className="text-[15.5px] font-semibold text-white">Credit / Debit card</div>
-              <div className="text-[13px] text-white/45">Visa, Mastercard, Amex</div>
-            </div>
-            {method === 'card' && (
-              <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-aqua-400">
-                <Check className="h-3.5 w-3.5 text-ink-950" strokeWidth={3.2} />
-              </span>
-            )}
-          </button>
-        </div>
-
-        {method === 'card' && (
-          <div className="card mt-3 space-y-3.5 p-4">
-            <div>
-              <label className="label" htmlFor="cardnum">
-                Card number
-              </label>
-              <input
-                id="cardnum"
-                className="field"
-                placeholder="4242 4242 4242 4242"
-                inputMode="numeric"
-                disabled
-              />
-            </div>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="label" htmlFor="exp">
-                  Expiry
-                </label>
-                <input id="exp" className="field" placeholder="MM / YY" disabled />
+      <StatusBar />
+      <NavBar title="Payment" subtitle="Choose your payment method" back step={[4, 5]} />
+      <Screen withBottomBar className="px-5">
+        <h2 className="mb-2.5 text-[15px] font-semibold text-white">Booking Summary</h2>
+        <div className="card p-3.5">
+          <div className="flex items-center gap-3.5">
+            <Photo src={imageFor(service?.image)} className="h-[58px] w-[72px] shrink-0" />
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[15px] font-semibold text-white">{service?.name}</div>
+              <div className="mt-0.5 text-[12.5px] text-white/45">
+                {car?.type} · {car?.plate}
               </div>
-              <div className="w-[110px]">
-                <label className="label" htmlFor="cvc">
-                  CVC
-                </label>
-                <input id="cvc" className="field" placeholder="123" disabled />
+              <div className="text-[12.5px] text-white/45">
+                {draft.date ? shortDate(draft.date) : ''} · {draft.time ? time12(draft.time) : ''}
               </div>
+              <div className="truncate text-[12.5px] text-white/45">{location?.address}</div>
             </div>
-            <p className="text-[12px] text-white/30">Disabled in the demo build.</p>
           </div>
-        )}
 
-        <div className="card mt-5 space-y-2.5 p-4">
-          <PriceRow label="Service" value={aed(base)} />
-          {surcharge > 0 && <PriceRow label="Size supplement" value={`+ ${aed(surcharge)}`} />}
-          <PriceRow label="VAT" value="Included" muted />
-          <PriceRow label="Total due" value={aed(total)} strong />
+          {(addOns.length > 0 || surcharge > 0) && (
+            <ul className="mt-3 space-y-1.5 border-t border-ink-700/60 pt-3 text-[12.5px]">
+              <li className="flex justify-between text-white/50">
+                <span>{service?.name}</span>
+                <span>{aed(base)}</span>
+              </li>
+              {surcharge > 0 && (
+                <li className="flex justify-between text-white/50">
+                  <span>{car?.type} size supplement</span>
+                  <span>+ {aed(surcharge)}</span>
+                </li>
+              )}
+              {addOns.map((a) => (
+                <li key={a.id} className="flex justify-between text-white/50">
+                  <span>{a.name}</span>
+                  <span>+ {aed(a.price)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="mt-3 flex items-baseline justify-between border-t border-ink-700/60 pt-3">
+            <span className="text-[13px] text-white/45">
+              {addOnTotal > 0 ? `${addOns.length} add-on${addOns.length > 1 ? 's' : ''}` : 'Subtotal'}
+            </span>
+            <span className="text-[18px] font-bold text-white">{aed(total)}</span>
+          </div>
         </div>
 
-        {error && <p className="mt-4 text-[13.5px] text-rose-400">{error}</p>}
+        <h2 className="mb-2.5 mt-6 text-[15px] font-semibold text-white">Payment Method</h2>
+        <div className="card divide-y divide-ink-700/50 overflow-hidden">
+          {METHODS.map(({ key, Icon, hint }) => {
+            const on = method === key
+            return (
+              <button
+                key={key}
+                onClick={() => setMethod(key)}
+                className="flex w-full items-center gap-3.5 px-4 py-3.5 text-left"
+              >
+                <span
+                  className={`flex h-[21px] w-[21px] shrink-0 items-center justify-center rounded-full border-2 transition ${
+                    on ? 'border-blush-400' : 'border-ink-600'
+                  }`}
+                >
+                  {on && <span className="h-[11px] w-[11px] rounded-full bg-blush-400" />}
+                </span>
+                <Icon className="h-[19px] w-[19px] shrink-0 text-white/70" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[14.5px] text-white">{PAYMENT_LABELS[key]}</div>
+                  <div className="text-[11.5px] text-white/35">{hint}</div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
 
-        {notifyMode() === 'link' && (
-          <p className="mt-4 px-1 text-[12px] leading-relaxed text-white/30">
-            On confirm, WhatsApp opens with the booking details ready to send to the shop.
-          </p>
-        )}
+        <button
+          onClick={() => setSaveMethod(!saveMethod)}
+          className="mt-3.5 flex w-full items-center gap-3 text-left"
+        >
+          <span
+            className={`flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-[5px] border transition ${
+              saveMethod ? 'border-blush-400 bg-blush-400' : 'border-ink-600 bg-ink-800'
+            }`}
+          >
+            {saveMethod && <Check className="h-3 w-3 text-ink-950" strokeWidth={3.4} />}
+          </span>
+          <span className="text-[13px] text-white/55">Save payment method for future bookings</span>
+        </button>
 
-        <div className="h-28" />
+        <div className="mt-5 flex items-baseline justify-between border-t border-ink-700/60 pt-4">
+          <span className="text-[15px] font-semibold text-white">Total</span>
+          <span className="text-[20px] font-bold text-white">{aed(total)}</span>
+        </div>
+
+        <p className="mt-3 text-[11.5px] leading-relaxed text-white/30">
+          Demo checkout — no card is charged and no payment details are stored.
+          {notifyMode() === 'link' &&
+            ' On confirm, WhatsApp opens with the booking ready to send to the shop.'}
+        </p>
+
+        {error && <p className="mt-3 text-[13px] text-rose-400">{error}</p>}
+
+        <div className="h-4" />
       </Screen>
 
       <BottomBar>
-        <button className="btn-primary" onClick={confirmAndPay} disabled={busy}>
+        <button className="btn-primary" onClick={confirm} disabled={busy}>
           {busy ? (
             'Confirming…'
-          ) : method === 'apple' ? (
-            <>
-              <Apple className="h-[18px] w-[18px]" />
-              Pay {aed(total)}
-            </>
           ) : (
-            <>Confirm &amp; pay {aed(total)}</>
+            <>
+              Confirm Booking
+              <ArrowRight className="h-[18px] w-[18px]" />
+            </>
           )}
         </button>
       </BottomBar>
