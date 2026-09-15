@@ -41,7 +41,7 @@ export default function Login() {
       <NavBar back={() => navigate('/welcome')} />
 
       <div className="no-scrollbar flex-1 overflow-y-auto px-6 pb-8">
-        <Logo compact />
+        <Logo variant="lockup" width={186} />
 
         <h1 className="mt-8 text-[27px] font-bold leading-tight tracking-tight text-white">
           {mode === 'signup' ? (

@@ -18,8 +18,8 @@ export default function Welcome() {
       <StatusBar />
 
       <div className="relative flex flex-1 flex-col items-center px-7">
-        <div className="mt-10">
-          <Logo size={190} />
+        <div className="mt-8">
+          <Logo variant="crest" width={300} />
         </div>
 
         <div className="mt-auto w-full pb-8 text-center">

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Logo from '../components/Logo'
 import StatusBar from '../components/StatusBar'
 import { NavBar, Photo, Screen } from '../components/Layout'
 import { ChevronRight, Sparkle } from '../components/Icons'
@@ -36,16 +37,7 @@ export default function Services() {
       <NavBar
         title="Our Services"
         accentTitle
-        right={
-          <div className="pr-0.5 text-right leading-none">
-            <div className="font-display text-[13px] font-semibold tracking-[0.05em] text-white">
-              DETAILING<span className="text-blush-400">LAB</span>
-            </div>
-            <div className="mt-1 text-[6px] font-medium uppercase tracking-[0.34em] text-white/30">
-              Premium Car Care
-            </div>
-          </div>
-        }
+        right={<Logo variant="lockup" width={118} flat />}
       />
       <Screen withTabBar>
         <div className="no-scrollbar flex gap-2 overflow-x-auto px-5 pb-1">

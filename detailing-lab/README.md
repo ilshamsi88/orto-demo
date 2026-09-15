@@ -107,11 +107,41 @@ Order: *DL-4904*
 
 Two files own the entire look:
 
-- **`src/components/Logo.tsx`** — the circular crest wordmark. Replace the SVG with the
-  real logo file and the whole app updates; nothing else draws the brand.
+- **`src/components/Logo.tsx`** plus **`src/components/brand/glyphs.ts`** — the logo.
 - **`src/data/images.ts`** — every image in the app resolves through one map of
   generated SVG placeholders. Drop real photos into `public/img/` and change a value
   to `'/img/premium-wash.jpg'`. No other file references an image path.
+
+### The logo
+
+The supplied mark is reproduced as vector paths, not set in a font — the wordmark has
+to render identically in the app, the favicon, the PWA icon and a social card, and a
+webfont is a network dependency that silently falls back to a generic sans. Closest
+typeface match is the Eurostile / Good Times family; Orbitron is the nearest free
+equivalent. A vector file from the owner (SVG/AI/PDF) would let these paths be replaced
+with the exact originals.
+
+It ships as a three-cut system, because one lockup cannot cover every size — the
+wordmark is roughly 12:1, so the full crest turns to mush below about 180px:
+
+| Cut | Use | Size |
+|---|---|---|
+| `crest` | welcome screen, print | 180px+ |
+| `lockup` | headers, nav bars | 100–260px |
+| `monogram` | app icon, avatars | 24–100px |
+| `monogram` + `bare` | favicon — ring dropped so the DL stays legible | under 24px |
+
+```tsx
+<Logo variant="crest" width={300} />
+<Logo variant="lockup" width={118} flat />
+<Logo variant="monogram" width={32} flat weight={1.7} />
+```
+
+`flat` swaps the rose-gold gradient for solid rose — the metallic banding needs area to
+read and turns to noise below ~40px. `weight` thickens the strokes for small sizes.
+
+`public/icon.svg` (app icon) and `public/favicon.svg` are generated from the same
+monogram geometry.
 
 Colours live in `tailwind.config.js` as the `blush` (rose accent) and `ink` (warm
 near-black) scales.

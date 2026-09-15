@@ -1,6 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#0A0908"/>
-  <circle cx="256" cy="256" r="196" fill="none" stroke="#F2A9A0" stroke-width="8" opacity="0.55"/>
-  <text x="256" y="238" text-anchor="middle" fill="#FFFFFF" font-size="64" font-family="Georgia, serif" letter-spacing="2">DETAILING</text>
-  <text x="256" y="312" text-anchor="middle" fill="#F2A9A0" font-size="66" font-family="Georgia, serif" letter-spacing="12">LAB</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="170" y2="400">
+      <stop offset="0" stop-color="#FBDDD8"/><stop offset=".28" stop-color="#F2A9A0"/>
+      <stop offset=".5" stop-color="#C97F78"/><stop offset=".72" stop-color="#F7C5BE"/>
+      <stop offset="1" stop-color="#D68A82"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" rx="88" fill="#0A0908"/>
+  <g fill="none" stroke="url(#g)" stroke-linecap="round" stroke-linejoin="round" stroke-width="11">
+    <path d="M54.76,162.50 A150,150 0 0 1 345.24,162.50"/><path d="M343.09,245.00 A150,150 0 0 1 56.91,245.00"/>
+  </g>
+  <path d="M0,-25 C1.92,-9 7.04,-2.5 16,0 C7.04,2.5 1.92,9 0,25 C-1.92,9 -7.04,2.5 -16,0 C-7.04,-2.5 -1.92,-9 0,-25 Z" fill="url(#g)" transform="translate(200 100)"/>
+  <g transform="translate(93.04 132.80) scale(1.12)" fill="none" stroke="url(#g)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5,5 H62 L81,24 V76 L62,95 H5 Z"/><path d="M5,5 V95 H71" transform="translate(115 0)"/>
+  </g>
 </svg>
